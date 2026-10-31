@@ -557,25 +557,3 @@ Check that:
 ### Duplicate rows
 
 The current load disposition is `WRITE_APPEND`. Do not upload the same source batch repeatedly unless duplicate records are acceptable. A future production enhancement should add a staging table plus a `MERGE` statement keyed by a business identifier such as `hardware_id` or `location_id`.
-
-## Security Notes
-
-- Never commit service-account JSON files.
-- Never commit populated `.env` files.
-- External MySQL passwords are processed only in memory for the request.
-- Only read-only MySQL statements are accepted.
-- Uploaded files are validated by extension and detected MIME type and are limited to 10 MB.
-- Browser output is escaped before it is rendered into the preview table.
-- BigQuery provider errors are logged server-side rather than returned verbatim to users.
-
-## Future Enhancements
-
-The current portal is a reliable ingestion and preview boundary. The next production improvements would be:
-
-1. Add staging tables and idempotent `MERGE` operations to prevent duplicates.
-2. Add a data-quality report showing rejected row counts and reasons.
-3. Move large uploads to queued jobs so the browser request is not held open.
-4. Add authentication, authorization, and per-user source permissions.
-5. Add ingestion audit records containing source, target, row count, job ID, and status.
-6. Add schema versioning and explicit contracts for each source system.
-7. Add retry handling for transient Google Cloud and network failures.
