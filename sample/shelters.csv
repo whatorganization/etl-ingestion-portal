@@ -1,0 +1,5 @@
+location_id,shelter_name,capacity,has_backup_power
+LK-11,Colombo Central College,1500,true
+LK-11,Sugathadasa Stadium,5000,true
+LK-21,Kandy Municipal Hall,800,false
+LK-81,Badulla Post Office Hub,300,false
