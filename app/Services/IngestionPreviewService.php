@@ -14,9 +14,17 @@ class IngestionPreviewService
      */
     public function previewFile(UploadedFile $file): array
     {
+        return $this->formatPreview($this->rowsFromFile($file));
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function rowsFromFile(UploadedFile $file): array
+    {
         return match (strtolower($file->getClientOriginalExtension())) {
-            'csv' => $this->previewCsv($file),
-            'json' => $this->previewJson($file),
+            'csv' => $this->rowsFromCsv($file),
+            'json' => $this->rowsFromJson($file),
             default => throw new RuntimeException('Only CSV and JSON files are supported.'),
         };
     }
@@ -26,6 +34,15 @@ class IngestionPreviewService
      * @return array{columns: array<int, string>, rows: array<int, array<string, mixed>>, total: int}
      */
     public function previewExternalQuery(array $credentials): array
+    {
+        return $this->formatPreview($this->rowsFromExternalQuery($credentials));
+    }
+
+    /**
+     * @param  array{host: string, port: int, database: string, username: string, password: string, query: string}  $credentials
+     * @return array<int, array<string, mixed>>
+     */
+    public function rowsFromExternalQuery(array $credentials): array
     {
         $query = trim($credentials['query']);
 
@@ -50,13 +67,13 @@ class IngestionPreviewService
             throw new RuntimeException('Unable to connect or execute the query. Check the credentials and SQL syntax.');
         }
 
-        return $this->formatPreview($rows);
+        return $rows;
     }
 
     /**
      * @return array{columns: array<int, string>, rows: array<int, array<string, mixed>>, total: int}
      */
-    private function previewCsv(UploadedFile $file): array
+    private function rowsFromCsv(UploadedFile $file): array
     {
         $handle = fopen($file->getRealPath(), 'rb');
 
@@ -64,13 +81,13 @@ class IngestionPreviewService
             throw new RuntimeException('The uploaded file could not be read.');
         }
 
-        $headers = fgetcsv($handle);
+        $headers = fgetcsv($handle, null, ',', '"', '\\');
         $rows = [];
 
         if ($headers !== false) {
             $headers = array_map(fn (string $header): string => trim($header), $headers);
 
-            while (($row = fgetcsv($handle)) !== false) {
+            while (($row = fgetcsv($handle, null, ',', '"', '\\')) !== false) {
                 if (count(array_filter($row, fn (string|false|null $value): bool => $value !== null && $value !== '')) === 0) {
                     continue;
                 }
@@ -81,13 +98,13 @@ class IngestionPreviewService
 
         fclose($handle);
 
-        return $this->formatPreview($rows);
+        return $rows;
     }
 
     /**
      * @return array{columns: array<int, string>, rows: array<int, array<string, mixed>>, total: int}
      */
-    private function previewJson(UploadedFile $file): array
+    private function rowsFromJson(UploadedFile $file): array
     {
         $decoded = json_decode(file_get_contents($file->getRealPath()) ?: '', true);
 
@@ -101,7 +118,7 @@ class IngestionPreviewService
             throw new RuntimeException('The JSON file must contain objects with named fields.');
         }
 
-        return $this->formatPreview($rows);
+        return $rows;
     }
 
     /**

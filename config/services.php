@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'bigquery' => [
+        'project_id' => env('GOOGLE_CLOUD_PROJECT_ID'),
+        'dataset' => env('GOOGLE_BIGQUERY_DATASET', 'weather_data'),
+        'credentials' => env('GOOGLE_APPLICATION_CREDENTIALS'),
+    ],
+
 ];
