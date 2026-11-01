@@ -1,9 +1,8 @@
 -- ==============================================================================================
--- ENTERPRISE DATA WAREHOUSE: 15 GUARANTEED BUSINESS QUERIES 
+-- ENTERPRISE DATA WAREHOUSE: 15 GUARANTEED BUSINESS QUERIES (ROUNDED DECIMALS)
 -- ==============================================================================================
--- These queries have been specifically rebuilt to rely ONLY on your core, fully-populated 
--- tables (Geography, Topography, Conditions, AQI, and the live Fact table). 
--- This guarantees every single query will return data for your assignment screenshots.
+-- These queries rely ONLY on your core, fully-populated tables to guarantee results.
+-- All floating-point calculations (AVG, SUM, MATH) are rounded to 2 decimal places for clean reporting.
 -- ==============================================================================================
 
 -- Query 1: Average Temperature by Province
@@ -11,7 +10,7 @@
 -- Business Importance: Helps regional managers assess climatic comfort levels, impacting energy demand forecasting (like grid cooling load) across the country.
 SELECT 
     g.province, 
-    AVG(f.temperature_c) AS average_temperature
+    ROUND(AVG(f.temperature_c), 2) AS average_temperature
 FROM `weather-warehouse.weather_data.fact_hourly_environmental` f 
 JOIN `weather-warehouse.weather_data.dim_geography` g ON f.location_id = g.location_id 
 GROUP BY g.province 
@@ -22,7 +21,7 @@ ORDER BY average_temperature DESC;
 -- Business Importance: Critical for issuing wind warnings, securing infrastructure, and planning activities sensitive to high winds like construction and shipping.
 SELECT 
     g.district, 
-    MAX(f.wind_speed_kmh) AS max_wind_speed
+    ROUND(MAX(f.wind_speed_kmh), 2) AS max_wind_speed
 FROM `weather-warehouse.weather_data.fact_hourly_environmental` f 
 JOIN `weather-warehouse.weather_data.dim_geography` g ON f.location_id = g.location_id 
 GROUP BY g.district 
@@ -34,7 +33,7 @@ LIMIT 10;
 -- Business Importance: Helps understand broad weather patterns crucial for agriculture planning and national water resource management.
 SELECT 
     g.climate_zone, 
-    SUM(f.precipitation_mm) AS total_rainfall_mm
+    ROUND(SUM(f.precipitation_mm), 2) AS total_rainfall_mm
 FROM `weather-warehouse.weather_data.fact_hourly_environmental` f 
 JOIN `weather-warehouse.weather_data.dim_geography` g ON f.location_id = g.location_id 
 GROUP BY g.climate_zone;
@@ -44,7 +43,7 @@ GROUP BY g.climate_zone;
 -- Business Importance: Identifies areas experiencing severe heat, which is critical for issuing public safety warnings and protecting outdoor workers.
 SELECT 
     g.city, 
-    MAX(f.temperature_c) as peak_temperature
+    ROUND(MAX(f.temperature_c), 2) AS peak_temperature
 FROM `weather-warehouse.weather_data.fact_hourly_environmental` f 
 JOIN `weather-warehouse.weather_data.dim_geography` g ON f.location_id = g.location_id 
 GROUP BY g.city 
@@ -56,7 +55,7 @@ LIMIT 5;
 -- Business Importance: Provides insights into how pollution settles in different topographical basins, supporting targeted environmental interventions.
 SELECT 
     h.river_basin, 
-    AVG(f.pm2_5) as average_pm25
+    ROUND(AVG(f.pm2_5), 2) AS average_pm25
 FROM `weather-warehouse.weather_data.fact_hourly_environmental` f 
 JOIN `weather-warehouse.weather_data.dim_topography_hazard` h ON f.location_id = h.location_id 
 GROUP BY h.river_basin 
@@ -67,7 +66,7 @@ ORDER BY average_pm25 DESC;
 -- Business Importance: Establishes a baseline for normal weather operations and helps validate meteorological forecasting accuracy against actual recorded conditions.
 SELECT 
     c.condition_name, 
-    COUNT(f.fact_id) as occurrence_count
+    COUNT(f.fact_id) AS occurrence_count
 FROM `weather-warehouse.weather_data.fact_hourly_environmental` f 
 JOIN `weather-warehouse.weather_data.dim_condition` c ON f.weather_code = c.weather_code 
 GROUP BY c.condition_name 
@@ -78,7 +77,7 @@ ORDER BY occurrence_count DESC;
 -- Business Importance: Aids meteorologists in understanding microclimates and tuning pressure-based altitude and weather prediction models for Sri Lankan topography.
 SELECT 
     h.terrain_type, 
-    AVG(f.surface_pressure_hpa) as average_surface_pressure
+    ROUND(AVG(f.surface_pressure_hpa), 2) AS average_surface_pressure
 FROM `weather-warehouse.weather_data.fact_hourly_environmental` f 
 JOIN `weather-warehouse.weather_data.dim_topography_hazard` h ON f.location_id = h.location_id 
 GROUP BY h.terrain_type
@@ -89,7 +88,7 @@ ORDER BY average_surface_pressure ASC;
 -- Business Importance: Crucial for proactive disaster preparedness. Tracking moisture in high-risk zones helps calibrate early warning evacuation systems.
 SELECT 
     h.landslide_risk_level, 
-    AVG(f.relative_humidity_pct) as average_humidity
+    ROUND(AVG(f.relative_humidity_pct), 2) AS average_humidity
 FROM `weather-warehouse.weather_data.fact_hourly_environmental` f 
 JOIN `weather-warehouse.weather_data.dim_topography_hazard` h ON f.location_id = h.location_id 
 GROUP BY h.landslide_risk_level;
@@ -99,7 +98,7 @@ GROUP BY h.landslide_risk_level;
 -- Business Importance: Highlights locations with severe heat stress indices (often driven by high humidity), allowing the Ministry of Health to allocate resources.
 SELECT 
     g.city, 
-    AVG(f.apparent_temp_c - f.temperature_c) as average_heat_index_difference
+    ROUND(AVG(f.apparent_temp_c - f.temperature_c), 2) AS average_heat_index_difference
 FROM `weather-warehouse.weather_data.fact_hourly_environmental` f 
 JOIN `weather-warehouse.weather_data.dim_geography` g ON f.location_id = g.location_id 
 GROUP BY g.city 
@@ -111,7 +110,7 @@ LIMIT 10;
 -- Business Importance: Essential for high-level public health reporting, evaluating national pollution control measures, and communicating risks.
 SELECT 
     a.health_category, 
-    COUNT(f.fact_id) as total_readings
+    COUNT(f.fact_id) AS total_readings
 FROM `weather-warehouse.weather_data.fact_hourly_environmental` f 
 JOIN `weather-warehouse.weather_data.dim_air_quality_index` a ON f.us_aqi BETWEEN a.min_aqi AND a.max_aqi 
 GROUP BY a.health_category
@@ -122,7 +121,7 @@ ORDER BY total_readings DESC;
 -- Business Importance: Helps in agricultural planning (selecting crop resilience) and understanding infrastructure stress caused by thermal expansion and contraction.
 SELECT 
     g.province, 
-    (MAX(f.temperature_c) - MIN(f.temperature_c)) as temperature_volatility_range
+    ROUND((MAX(f.temperature_c) - MIN(f.temperature_c)), 2) AS temperature_volatility_range
 FROM `weather-warehouse.weather_data.fact_hourly_environmental` f 
 JOIN `weather-warehouse.weather_data.dim_geography` g ON f.location_id = g.location_id 
 GROUP BY g.province 
@@ -133,7 +132,7 @@ ORDER BY temperature_volatility_range DESC;
 -- Business Importance: Vital for aviation routing, maritime navigation, and optimal placement of wind energy turbines.
 SELECT 
     g.province, 
-    AVG(f.wind_direction_deg) as average_wind_direction
+    ROUND(AVG(f.wind_direction_deg), 2) AS average_wind_direction
 FROM `weather-warehouse.weather_data.fact_hourly_environmental` f 
 JOIN `weather-warehouse.weather_data.dim_geography` g ON f.location_id = g.location_id 
 GROUP BY g.province;
@@ -143,7 +142,7 @@ GROUP BY g.province;
 -- Business Importance: Directly correlates weather events to disaster risk, allowing emergency response teams to pre-position resources before severe flooding occurs.
 SELECT 
     h.flood_vulnerability, 
-    SUM(f.precipitation_mm) as total_rainfall_mm
+    ROUND(SUM(f.precipitation_mm), 2) AS total_rainfall_mm
 FROM `weather-warehouse.weather_data.fact_hourly_environmental` f 
 JOIN `weather-warehouse.weather_data.dim_topography_hazard` h ON f.location_id = h.location_id 
 GROUP BY h.flood_vulnerability
@@ -154,8 +153,8 @@ ORDER BY total_rainfall_mm DESC;
 -- Business Importance: Identifies urban centers with concerning levels of respiratory hazards, prompting air quality alerts and traffic/industrial regulations.
 SELECT 
     g.city, 
-    AVG(f.pm10) as average_pm10, 
-    AVG(f.nitrogen_dioxide) as average_no2
+    ROUND(AVG(f.pm10), 2) AS average_pm10, 
+    ROUND(AVG(f.nitrogen_dioxide), 2) AS average_no2
 FROM `weather-warehouse.weather_data.fact_hourly_environmental` f 
 JOIN `weather-warehouse.weather_data.dim_geography` g ON f.location_id = g.location_id 
 GROUP BY g.city 
@@ -168,7 +167,7 @@ LIMIT 10;
 SELECT 
     g.province, 
     c.category, 
-    COUNT(f.fact_id) as condition_count
+    COUNT(f.fact_id) AS condition_count
 FROM `weather-warehouse.weather_data.fact_hourly_environmental` f 
 JOIN `weather-warehouse.weather_data.dim_geography` g ON f.location_id = g.location_id 
 JOIN `weather-warehouse.weather_data.dim_condition` c ON f.weather_code = c.weather_code 
