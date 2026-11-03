@@ -1,5 +1,29 @@
 location_id,shelter_name,capacity,has_backup_power
-LK-11,Colombo Central College,1500,true
-LK-11,Sugathadasa Stadium,5000,true
-LK-21,Kandy Municipal Hall,800,false
-LK-81,Badulla Post Office Hub,300,false
+colombo_01,Colombo Central College,1500,true
+colombo_01,Sugathadasa Stadium,5000,true
+kandy_01,Kandy Municipal Hall,800,false
+kandy_01,Bogambara Stadium Shelter,2500,true
+badulla_01,Badulla Post Office Hub,300,false
+badulla_01,Uva College Hall,850,true
+ratnapura_01,Ratnapura Town Hall,600,true
+ratnapura_01,Sivali Central College,1200,false
+galle_01,Galle International Stadium,4000,true
+galle_01,Richmond College,1500,false
+gampaha_01,Bandaranayake College,2200,true
+gampaha_01,Gampaha District Hospital Wing,600,true
+kalutara_01,Kalutara Town Hall,800,false
+matale_01,Matale Science College,500,false
+nuwara_eliya_01,Nuwara Eliya Post Office,200,true
+nuwara_eliya_01,Gregory Lake Shelter,1500,false
+matara_01,Rahula College,2000,true
+hambantota_01,Hambantota Convention Centre,3000,true
+jaffna_01,Jaffna Public Library Hall,500,true
+jaffna_01,Jaffna Central College,1800,false
+kilinochchi_01,Kilinochchi Central College,1000,false
+mannar_01,Mannar Town Hall,400,false
+batticaloa_01,Batticaloa Weber Stadium,3500,true
+anuradhapura_01,Anuradhapura Central College,1800,true
+polonnaruwa_01,Royal College Polonnaruwa,1200,false
+kurunegala_01,Kurunegala Maliyadeva College,2200,true
+kegalle_01,Kegalle Balika Vidyalaya,900,false
+embilipitiya_01,Embilipitiya President College,1500,true

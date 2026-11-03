@@ -1,8 +1,8 @@
 -- ==============================================================================================
--- ENTERPRISE DATA WAREHOUSE: 15 GUARANTEED BUSINESS QUERIES (ROUNDED DECIMALS)
+-- ENTERPRISE DATA WAREHOUSE: 15 GUARANTEED BUSINESS QUERIES (ROUNDED + FULL ETL INTEGRATION)
 -- ==============================================================================================
--- These queries rely ONLY on your core, fully-populated tables to guarantee results.
--- All floating-point calculations (AVG, SUM, MATH) are rounded to 2 decimal places for clean reporting.
+-- These queries utilize your entire Star Schema, including the external CSV, JSON, and MySQL 
+-- data ingested via your Laravel portal. All calculations are rounded to 2 decimal places.
 -- ==============================================================================================
 
 -- Query 1: Average Temperature by Province
@@ -38,17 +38,16 @@ FROM `weather-warehouse.weather_data.fact_hourly_environmental` f
 JOIN `weather-warehouse.weather_data.dim_geography` g ON f.location_id = g.location_id 
 GROUP BY g.climate_zone;
 
--- Query 4: Top 5 Hottest Cities
--- Business Question: Which 5 cities have recorded the highest peak temperatures?
--- Business Importance: Identifies areas experiencing severe heat, which is critical for issuing public safety warnings and protecting outdoor workers.
+-- Query 4: Hardware Operational Status by Sensor Type (MySQL Data)
+-- Business Question: How many sensors of each type are currently online versus offline?
+-- Business Importance: Helps in monitoring the operational status of the sensor network, prioritizing hardware maintenance, and ensuring data collection reliability.
 SELECT 
-    g.city, 
-    ROUND(MAX(f.temperature_c), 2) AS peak_temperature
-FROM `weather-warehouse.weather_data.fact_hourly_environmental` f 
-JOIN `weather-warehouse.weather_data.dim_geography` g ON f.location_id = g.location_id 
-GROUP BY g.city 
-ORDER BY peak_temperature DESC 
-LIMIT 5;
+    dsh.sensor_type, 
+    dsh.status, 
+    COUNT(dsh.hardware_id) AS count_of_sensors
+FROM `weather-warehouse.weather_data.dim_sensor_hardware` dsh 
+GROUP BY dsh.sensor_type, dsh.status 
+ORDER BY count_of_sensors DESC;
 
 -- Query 5: Average PM2.5 by River Basin
 -- Business Question: What is the average fine particulate matter (PM2.5) pollution level grouped by river basin?
@@ -72,16 +71,18 @@ JOIN `weather-warehouse.weather_data.dim_condition` c ON f.weather_code = c.weat
 GROUP BY c.condition_name 
 ORDER BY occurrence_count DESC;
 
--- Query 7: Average Pressure by Terrain Type
--- Business Question: How does atmospheric surface pressure vary based on the physical terrain (Highland vs Coastal)?
--- Business Importance: Aids meteorologists in understanding microclimates and tuning pressure-based altitude and weather prediction models for Sri Lankan topography.
+-- Query 7: Emergency Shelters with Backup Power by District (CSV Data)
+-- Business Question: What is the total capacity of emergency shelters equipped with backup power in each district?
+-- Business Importance: Helps emergency services assess available resources for disaster response and route displaced civilians to facilities that have reliable electricity.
 SELECT 
-    h.terrain_type, 
-    ROUND(AVG(f.surface_pressure_hpa), 2) AS average_surface_pressure
-FROM `weather-warehouse.weather_data.fact_hourly_environmental` f 
-JOIN `weather-warehouse.weather_data.dim_topography_hazard` h ON f.location_id = h.location_id 
-GROUP BY h.terrain_type
-ORDER BY average_surface_pressure ASC;
+    dg.district, 
+    COUNT(des.shelter_name) AS total_shelters, 
+    SUM(des.capacity) AS total_capacity
+FROM `weather-warehouse.weather_data.dim_emergency_shelters` des
+JOIN `weather-warehouse.weather_data.dim_geography` dg ON des.location_id = dg.location_id
+WHERE des.has_backup_power = TRUE
+GROUP BY dg.district
+ORDER BY total_capacity DESC;
 
 -- Query 8: Average Humidity by Landslide Risk Level
 -- Business Question: What is the average relative humidity in areas categorized by different landslide risk levels?
@@ -105,16 +106,18 @@ GROUP BY g.city
 ORDER BY average_heat_index_difference DESC 
 LIMIT 10;
 
--- Query 10: Air Quality Index Breakdown
--- Business Question: How many readings fall into each US EPA Air Quality Health Category?
--- Business Importance: Essential for high-level public health reporting, evaluating national pollution control measures, and communicating risks.
+-- Query 10: Demographics & Air Quality Risk (JSON Data)
+-- Business Question: What is the average PM10 pollution level in districts with a high percentage of vulnerable elderly populations?
+-- Business Importance: Directly links environmental hazards to demographic vulnerability, allowing the Ministry of Health to allocate respiratory care resources effectively.
 SELECT 
-    a.health_category, 
-    COUNT(f.fact_id) AS total_readings
-FROM `weather-warehouse.weather_data.fact_hourly_environmental` f 
-JOIN `weather-warehouse.weather_data.dim_air_quality_index` a ON f.us_aqi BETWEEN a.min_aqi AND a.max_aqi 
-GROUP BY a.health_category
-ORDER BY total_readings DESC;
+    dg.district, 
+    dd.vulnerable_elderly_pct, 
+    ROUND(AVG(f.pm10), 2) AS average_pm10
+FROM `weather-warehouse.weather_data.fact_hourly_environmental` f
+JOIN `weather-warehouse.weather_data.dim_geography` dg ON f.location_id = dg.location_id
+JOIN `weather-warehouse.weather_data.dim_district_demographics` dd ON f.location_id = dd.location_id
+GROUP BY dg.district, dd.vulnerable_elderly_pct
+ORDER BY average_pm10 DESC;
 
 -- Query 11: Temperature Volatility (Range) by Province
 -- Business Question: Which provinces experience the widest swing between their maximum and minimum recorded temperatures?
@@ -148,29 +151,27 @@ JOIN `weather-warehouse.weather_data.dim_topography_hazard` h ON f.location_id =
 GROUP BY h.flood_vulnerability
 ORDER BY total_rainfall_mm DESC;
 
--- Query 14: Average PM10 and Nitrogen Dioxide by City
--- Business Question: What are the average PM10 and Nitrogen Dioxide pollution levels in each city?
--- Business Importance: Identifies urban centers with concerning levels of respiratory hazards, prompting air quality alerts and traffic/industrial regulations.
+-- Query 14: Emergency Shelter Availability vs Population Density (JSON & CSV Data)
+-- Business Question: Are emergency shelters adequately distributed in high-density districts?
+-- Business Importance: A purely dimensional strategic query that reveals resource gaps, highlighting where new shelters must be built to protect dense populations.
 SELECT 
-    g.city, 
-    ROUND(AVG(f.pm10), 2) AS average_pm10, 
-    ROUND(AVG(f.nitrogen_dioxide), 2) AS average_no2
-FROM `weather-warehouse.weather_data.fact_hourly_environmental` f 
-JOIN `weather-warehouse.weather_data.dim_geography` g ON f.location_id = g.location_id 
-GROUP BY g.city 
-ORDER BY average_pm10 DESC 
-LIMIT 10;
+    dg.district, 
+    dd.population_density_km2, 
+    SUM(des.capacity) AS total_district_shelter_capacity
+FROM `weather-warehouse.weather_data.dim_geography` dg
+JOIN `weather-warehouse.weather_data.dim_district_demographics` dd ON dg.location_id = dd.location_id
+LEFT JOIN `weather-warehouse.weather_data.dim_emergency_shelters` des ON dg.location_id = des.location_id
+GROUP BY dg.district, dd.population_density_km2
+ORDER BY dd.population_density_km2 DESC;
 
--- Query 15: Most Common Weather Category by Province
--- Business Question: What weather condition category (e.g., Clear, Precipitation, Cloud) is most common in each province?
--- Business Importance: Provides a long-term climatic profile for different regions, aiding in tourism marketing and regional infrastructure design.
+-- Query 15: Network Health: Percentage of Offline Sensors by Province (MySQL Data)
+-- Business Question: What percentage of our weather sensors are currently failing or offline in each province?
+-- Business Importance: Provides an executive overview of sensor network health by region, forcing accountability for regional maintenance teams.
 SELECT 
-    g.province, 
-    c.category, 
-    COUNT(f.fact_id) AS condition_count
-FROM `weather-warehouse.weather_data.fact_hourly_environmental` f 
-JOIN `weather-warehouse.weather_data.dim_geography` g ON f.location_id = g.location_id 
-JOIN `weather-warehouse.weather_data.dim_condition` c ON f.weather_code = c.weather_code 
-GROUP BY g.province, c.category 
-ORDER BY condition_count DESC 
-LIMIT 15;
+    dg.province, 
+    COUNT(dsh.hardware_id) AS total_sensors,
+    ROUND(COUNT(CASE WHEN dsh.status = 'Offline' THEN 1 END) * 100.0 / COUNT(dsh.hardware_id), 2) AS offline_percentage
+FROM `weather-warehouse.weather_data.dim_sensor_hardware` dsh
+JOIN `weather-warehouse.weather_data.dim_geography` dg ON dsh.location_id = dg.location_id
+GROUP BY dg.province
+ORDER BY offline_percentage DESC;

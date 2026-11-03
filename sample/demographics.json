@@ -1,17 +1,132 @@
 [
   {
-    "location_id": "LK-11",
+    "location_id": "colombo_01",
     "population_density_km2": 3400,
     "vulnerable_elderly_pct": 14.5
   },
   {
-    "location_id": "LK-21",
+    "location_id": "kandy_01",
     "population_density_km2": 670,
     "vulnerable_elderly_pct": 16.2
   },
   {
-    "location_id": "LK-81",
+    "location_id": "badulla_01",
     "population_density_km2": 310,
     "vulnerable_elderly_pct": 12.1
+  },
+  {
+    "location_id": "ratnapura_01",
+    "population_density_km2": 450,
+    "vulnerable_elderly_pct": 11.0
+  },
+  {
+    "location_id": "galle_01",
+    "population_density_km2": 800,
+    "vulnerable_elderly_pct": 15.3
+  },
+  {
+    "location_id": "gampaha_01",
+    "population_density_km2": 1711,
+    "vulnerable_elderly_pct": 13.8
+  },
+  {
+    "location_id": "kalutara_01",
+    "population_density_km2": 775,
+    "vulnerable_elderly_pct": 14.1
+  },
+  {
+    "location_id": "matale_01",
+    "population_density_km2": 252,
+    "vulnerable_elderly_pct": 15.4
+  },
+  {
+    "location_id": "nuwara_eliya_01",
+    "population_density_km2": 415,
+    "vulnerable_elderly_pct": 10.5
+  },
+  {
+    "location_id": "matara_01",
+    "population_density_km2": 643,
+    "vulnerable_elderly_pct": 14.9
+  },
+  {
+    "location_id": "hambantota_01",
+    "population_density_km2": 230,
+    "vulnerable_elderly_pct": 11.2
+  },
+  {
+    "location_id": "jaffna_01",
+    "population_density_km2": 628,
+    "vulnerable_elderly_pct": 15.1
+  },
+  {
+    "location_id": "kilinochchi_01",
+    "population_density_km2": 94,
+    "vulnerable_elderly_pct": 10.3
+  },
+  {
+    "location_id": "mannar_01",
+    "population_density_km2": 55,
+    "vulnerable_elderly_pct": 9.8
+  },
+  {
+    "location_id": "vavuniya_01",
+    "population_density_km2": 86,
+    "vulnerable_elderly_pct": 10.1
+  },
+  {
+    "location_id": "mullaitivu_01",
+    "population_density_km2": 35,
+    "vulnerable_elderly_pct": 9.5
+  },
+  {
+    "location_id": "batticaloa_01",
+    "population_density_km2": 201,
+    "vulnerable_elderly_pct": 12.2
+  },
+  {
+    "location_id": "ampara_01",
+    "population_density_km2": 154,
+    "vulnerable_elderly_pct": 11.5
+  },
+  {
+    "location_id": "trincomalee_01",
+    "population_density_km2": 145,
+    "vulnerable_elderly_pct": 11.8
+  },
+  {
+    "location_id": "kurunegala_01",
+    "population_density_km2": 348,
+    "vulnerable_elderly_pct": 14.0
+  },
+  {
+    "location_id": "puttalam_01",
+    "population_density_km2": 264,
+    "vulnerable_elderly_pct": 11.4
+  },
+  {
+    "location_id": "anuradhapura_01",
+    "population_density_km2": 128,
+    "vulnerable_elderly_pct": 13.1
+  },
+  {
+    "location_id": "polonnaruwa_01",
+    "population_density_km2": 132,
+    "vulnerable_elderly_pct": 12.6
+  },
+  {
+    "location_id": "monaragala_01",
+    "population_density_km2": 83,
+    "vulnerable_elderly_pct": 10.9
+  },
+  {
+    "location_id": "kegalle_01",
+    "population_density_km2": 508,
+    "vulnerable_elderly_pct": 14.6
+  },
+  {
+    "location_id": "embilipitiya_01",
+    "population_density_km2": 365,
+    "vulnerable_elderly_pct": 11.1
   }
 ]
